@@ -13,19 +13,21 @@ My answers to the Cowrywise Data Analyst SQL assessment are included in this pro
 
 METHOD OF APPROACH:
 
-I first of all had to understand the scenario where the company wanted to see customers who had both a savings and an investment account with the company. And from the hints given, we see that the savings and investment plans had different ways of selecting them from the savings_saving table, referencing the *is_a_regular_savings* and *is_a_fund* fields in the table. Also, having to provide more than one count result (for savings and investment count) accross three tables, I decided to implement Common Table Expressions (CTE) to make my query easier to read and more efficient. I created two CTEs, one for the savings account, and the other for the investment account.
+I began by analyzing the scenario, which required identifying users who have both savings and investment accounts. From the structure of the *savings_savingsaccount* and *plans_plan* tables, I observed that savings plans are identified by *is_regular_savings = 1*, while investment plans are flagged using *is_a_fund = 1*. Since we needed to aggregate counts and amounts from multiple sources, I opted to use Common Table Expressions (CTEs) to make the query more modular and readable.
 
-I created the first CTE by joining the savings and the plans tables with *p.is_regular_savings = 1* to get the savings count and the total savings deposit which was later added to the total investment deposit to get the finanl value for the total deposit (taking the confirmed amount as the amount remaining after a withdrwal, and every necessary deduction have been made) as required in the question. The secons CTE was created also by joining the savings and the plans table with *p.is_a_fund = 1* to get the count of invesment accounts belonging to a single owner.
+The first CTE joins the *savings_savingsaccount* and *plans_plan* tables to isolate savings accounts and calculate both the number of savings accounts per user and their total confirmed deposits. The second CTE similarly filters for investment accounts and computes the count per user.
 
-Lastly, I wrote the query that retunrs the expected result by qeurrying the 2 CTEs and joining it with the owners table which contained the names of each user. I also had to use *CONCAT()* to combine the first and last names of each user to get their full names. The query was sorted by total deposit as instructed.
+In the final query, I joined both CTEs with the *users_customuser* table to retrieve each customer’s full name using *CONCAT(first_name, last_name)*. I then computed the total deposit by summing savings and investment confirmed deposits. Finally, I ordered the result by total deposit in descending order, as required in the problem.
 
 # Assessment_Q2
 
 METHOD OF APPROACH:
 
-I understood from the scenario that the finance team wanted to know how often each user carried out a transaction so as to classify them under different categories. With this understanding, I knew that I had to count the number of transactions each customer carried out on average over a period of one active month, and thus, create a *CASE STATEMENT* that will categorize them dependent on the number of their average monthly transactions.
+The goal of this task was to help the finance team classify users based on how frequently they performed transactions. To achieve this, I needed to calculate the average number of transactions each user made per active month and then categorize them based on their transaction frequency.
 
-I created three CTEs, the first one to calculate the number of monthly transactions for each month over the number of years in the dataset (2016 - 2018) using *EXTRACT()* Function. I then went on to create the second CTE which calculated the average number of transaction based on the number of transaction returned from the first CTE. I did this to avoid clustering the first CTE with both the count and average calculations to help the query be more efficient. Lastly, I created another CTE known as 'categorized user' where I created a csee that classifies users based on their average monthly transactions. Tthe final query was sorted by the average transactions per month.
+I completed this task by creating three Common Table Expressions (CTEs) to structure the logic. The first CTE calculated the total number of transactions each user made per month by using the *EXTRACT()* function to isolate the year and month from each transaction's date. The second CTE computed the average number of transactions per user across all their active months, based on the monthly counts obtained from the first CTE. This separation helped keep each CTE focused and the overall query efficient.
+
+The third CTE, named categorized_users, used a CASE statement to classify users into 'High Frequency', 'Medium Frequency', or 'Low Frequency' categories depending on their average monthly transaction count. Finally, the main query grouped the users by category, calculated the total number of users in each group, and displayed the average monthly transaction per category. The result was ordered by average transaction count in descending order to highlight the most active user categories
 
 CHALLENGE:
 
